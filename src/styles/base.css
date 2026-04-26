@@ -1,0 +1,49 @@
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #1b2638;
+  background: #eef2f7;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  --red: #d52b1e;
+  --ink: #172033;
+  --muted: #637086;
+  --line: #d7dee8;
+  --panel: #ffffff;
+  --soft: #f5f7fb;
+  --blue: #2f6fed;
+  --green: #00a676;
+  --magenta: #c0579d;
+  --amber: #b26a00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1180px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.hidden {
+  display: none;
+}
+

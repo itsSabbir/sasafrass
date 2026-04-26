@@ -1,0 +1,225 @@
+.app-shell {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 58px 38px 1fr;
+  background: #eef2f7;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: 290px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.brand-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 210px;
+}
+
+.mode-tabs {
+  display: inline-flex;
+  justify-self: center;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.mode-tabs button {
+  min-width: 92px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  color: #46546a;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mode-tabs button.active {
+  color: #fff;
+  background: var(--ink);
+}
+
+.top-actions,
+.view-actions,
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.icon-button,
+.mini-button,
+.text-button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #253247;
+  border-radius: 7px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.icon-button {
+  width: 32px;
+  padding: 0;
+}
+
+.mini-button {
+  width: 26px;
+  min-height: 26px;
+  padding: 0;
+}
+
+.text-button {
+  padding: 0 10px;
+}
+
+.text-button.primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.text-button.active {
+  color: #fff;
+  background: #253247;
+  border-color: #253247;
+}
+
+.icon-button.active,
+.icon-button:hover,
+.mini-button:hover,
+.text-button:hover {
+  border-color: #9aa8bb;
+  background: #f7f9fc;
+}
+
+.text-button.primary:hover {
+  background: #bd2318;
+  border-color: #bd2318;
+}
+
+.icon-button.danger:hover {
+  border-color: #e5a4a0;
+  color: var(--red);
+}
+
+.status-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+}
+
+.health-pill {
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: #526176;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.health-pill .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.health-pill.error {
+  color: #aa241b;
+  border-color: #efb4af;
+  background: #fff4f2;
+}
+
+.health-pill.warning {
+  color: #875200;
+  border-color: #efd19a;
+  background: #fff9ec;
+}
+
+.health-pill.ok {
+  color: #08784f;
+  border-color: #a9dec8;
+  background: #f0fff8;
+}
+
+.status-spacer,
+.toolbar-spacer {
+  flex: 1;
+}
+
+.status-text {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.app-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 304px minmax(680px, 1fr) 392px;
+}
+
+.left-panel,
+.inspector {
+  overflow: auto;
+  background: #fff;
+  border-right: 1px solid var(--line);
+}
+
+.inspector {
+  border-right: 0;
+  border-left: 1px solid var(--line);
+}
+

@@ -1,0 +1,145 @@
+.panel-section {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-heading,
+.inspector-subhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  color: #2a3547;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.flow-list,
+.template-list,
+.search-results,
+.snapshot-list {
+  display: grid;
+  gap: 7px;
+}
+
+.flow-list button,
+.template-list button,
+.search-results button,
+.snapshot-list button {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 7px;
+  padding: 9px;
+  text-align: left;
+  display: grid;
+  gap: 3px;
+}
+
+.flow-list button.active {
+  border-color: #a8b6c8;
+  background: #f2f6fb;
+}
+
+.flow-list span,
+.search-results span,
+.snapshot-list span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flow-list small,
+.template-list span,
+.search-results small,
+.snapshot-list small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.node-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.node-type-grid button {
+  min-width: 0;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px;
+  color: #263246;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.type-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  background: #7a8799;
+}
+
+.type-dot.source {
+  background: var(--blue);
+}
+
+.type-dot.job {
+  background: var(--red);
+}
+
+.type-dot.transform {
+  background: var(--green);
+}
+
+.type-dot.join {
+  background: var(--magenta);
+}
+
+.type-dot.output {
+  background: #7c4dff;
+}
+
+.type-dot.validation {
+  background: var(--amber);
+}
+
+.type-dot.note {
+  background: #6b7280;
+}
+
+.search-box,
+.command-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.search-box input,
+.command-input-wrap input {
+  border: 0;
+  outline: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.empty-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+

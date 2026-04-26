@@ -1,0 +1,55 @@
+project:
+  name: SASDIS Flow Planner
+  package: sasafrass
+  architecture: single-package-vite-react
+  source_of_truth: exported project JSON
+  local_first: true
+
+review_contract:
+  required_commands:
+    - npm run typecheck
+    - npm test
+    - npm run build
+  manual_smoke_url: http://127.0.0.1:5173
+  critical_paths:
+    - canvas drag/drop/connect/zoom/pan
+    - local autosave/import/export JSON
+    - dependency ordering and cycle detection
+    - DevOps runbook Markdown and CSV exports
+    - design review metadata table
+
+module_owners:
+  app_state:
+    files:
+      - src/hooks/usePlannerWorkspace.ts
+      - src/app/storage.ts
+      - src/app/canvasGeometry.ts
+  graph_and_validation:
+    files:
+      - src/graph.ts
+      - src/graph.test.ts
+  exports:
+    files:
+      - src/exporters.ts
+      - src/exporters.test.ts
+  canvas_ui:
+    files:
+      - src/features/canvas/CanvasWorkspace.tsx
+  metadata_ui:
+    files:
+      - src/features/inspector/Inspector.tsx
+  navigation_ui:
+    files:
+      - src/features/navigation/LeftPanel.tsx
+  review_views:
+    files:
+      - src/views/RunPlanView.tsx
+      - src/views/DesignView.tsx
+      - src/views/ReviewerView.tsx
+
+quality_gates:
+  no_monorepo: true
+  no_large_app_shell: true
+  app_shell_limit_kb: 8
+  preserve_json_version: 1
+  defer_backend_integrations: true
