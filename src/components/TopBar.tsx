@@ -21,7 +21,8 @@ const modeLabels: Record<Mode, string> = {
   canvas: "Flow Plan",
   runbook: "SAS Jobs",
   design: "Data Design",
-  review: "Review"
+  review: "Review",
+  cleaner: "Code Cleaner"
 };
 
 export function TopBar(props: TopBarProps) {
