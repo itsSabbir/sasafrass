@@ -5,6 +5,7 @@ import { CanvasWorkspace } from "./features/canvas/CanvasWorkspace";
 import { Inspector } from "./features/inspector/Inspector";
 import { LeftPanel } from "./features/navigation/LeftPanel";
 import { usePlannerWorkspace } from "./hooks/usePlannerWorkspace";
+import { CodeCleanerView } from "./views/CodeCleanerView";
 import { DesignView } from "./views/DesignView";
 import { ReviewerView } from "./views/ReviewerView";
 import { RunPlanView } from "./views/RunPlanView";
@@ -103,6 +104,7 @@ export default function App() {
           {workspace.mode === "review" && (
             <ReviewerView project={workspace.project} flow={activeFlow} runbook={runbook} issues={workspace.allIssues} exportBundle={workspace.exportBundle} />
           )}
+          {workspace.mode === "cleaner" && <CodeCleanerView />}
         </section>
 
         <Inspector
