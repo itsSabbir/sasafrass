@@ -1,13 +1,10 @@
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { cleanSasCode } from "./index";
 import { findMacroEnd } from "./macroBalancer";
 import { parseJobHeader, parseStepHeader } from "./headerParser";
 import { segment } from "./segmenter";
-
-const fixtureDir = resolve(dirname(fileURLToPath(import.meta.url)), "__fixtures__");
+import fullJobInput from "./__fixtures__/fullJob.input.sas?raw";
+import fullJobExpected from "./__fixtures__/fullJob.expected.sas?raw";
 
 describe("findMacroEnd", () => {
   it("finds %mend on the same line for a flat single-line macro", () => {
@@ -332,10 +329,8 @@ describe("cleanSasCode", () => {
   });
 
   it("matches the golden fullJob fixture and reduces by at least 50%", () => {
-    const input = readFileSync(resolve(fixtureDir, "fullJob.input.sas"), "utf-8");
-    const expected = readFileSync(resolve(fixtureDir, "fullJob.expected.sas"), "utf-8");
-    const result = cleanSasCode(input);
-    expect(result.cleaned).toBe(expected);
+    const result = cleanSasCode(fullJobInput);
+    expect(result.cleaned).toBe(fullJobExpected.replace(/\r\n/g, "\n").replace(/\s+$/, ""));
     expect(result.stats.percentReduction).toBeGreaterThanOrEqual(50);
   });
 });

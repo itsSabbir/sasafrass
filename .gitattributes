@@ -1,0 +1,3 @@
+# Fixtures must round-trip identically across platforms — keep LF so the
+# golden-output assertion in cleaner.test.ts is deterministic.
+*.sas text eol=lf
