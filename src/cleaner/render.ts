@@ -1,14 +1,25 @@
 import { parseJobHeader, parseStepHeader } from "./headerParser";
-import type { CleanResult, CleanStats, ParsedStepHeader, Segment } from "./types";
+import type {
+  CleanResult,
+  CleanStats,
+  ParsedStepHeader,
+  RemovedSegment,
+  Segment
+} from "./types";
 
 export function render(input: string, segments: readonly Segment[]): CleanResult {
   const blocks: string[] = [];
+  const removed: RemovedSegment[] = [];
   for (const seg of segments) {
     const rendered = renderSegment(seg);
-    if (rendered !== null) blocks.push(rendered);
+    if (rendered !== null) {
+      blocks.push(rendered);
+      continue;
+    }
+    if (isRemovable(seg)) removed.push(toRemovedSegment(seg));
   }
   const cleaned = blocks.join("\n\n").replace(/\s+$/, "");
-  return { cleaned, stats: computeStats(input, cleaned) };
+  return { cleaned, stats: computeStats(input, cleaned), removed };
 }
 
 function renderSegment(seg: Segment): string | null {
@@ -27,6 +38,45 @@ function renderSegment(seg: Segment): string | null {
     case "stepEndComment":
       return null;
   }
+}
+
+function isRemovable(seg: Segment): boolean {
+  return (
+    seg.kind === "boilerplateMacro" ||
+    seg.kind === "boilerplateInvocation" ||
+    seg.kind === "boilerplateLet" ||
+    seg.kind === "stepEndComment"
+  );
+}
+
+function toRemovedSegment(seg: Segment): RemovedSegment {
+  if (seg.kind === "stepEndComment") {
+    return {
+      category: seg.kind,
+      text: seg.line,
+      inputLineStart: seg.inputLineStart,
+      inputLineEnd: seg.inputLineEnd
+    };
+  }
+  if (seg.kind === "boilerplateMacro") {
+    return {
+      category: seg.kind,
+      name: seg.name,
+      text: seg.lines.join("\n"),
+      inputLineStart: seg.inputLineStart,
+      inputLineEnd: seg.inputLineEnd
+    };
+  }
+  if (seg.kind === "boilerplateInvocation" || seg.kind === "boilerplateLet") {
+    return {
+      category: seg.kind,
+      text: seg.lines.join("\n"),
+      inputLineStart: seg.inputLineStart,
+      inputLineEnd: seg.inputLineEnd
+    };
+  }
+  // Defensive default — isRemovable gates this branch, so unreachable in practice.
+  throw new Error(`toRemovedSegment called with non-removable kind: ${seg.kind}`);
 }
 
 function renderJobHeader(lines: readonly string[]): string | null {

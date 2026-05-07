@@ -338,3 +338,119 @@
 .cleaner-textarea:focus {
   background: #fbfdff;
 }
+
+.cleaner-audit {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cleaner-audit > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  color: #344257;
+  font-weight: 700;
+}
+
+.cleaner-audit > summary::marker,
+.cleaner-audit > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cleaner-audit > summary .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+
+.cleaner-audit > summary strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.cleaner-audit[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.cleaner-audit-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.cleaner-audit-item {
+  padding: 8px 14px;
+  border-top: 1px solid #eef2f7;
+}
+
+.cleaner-audit-item:first-child {
+  border-top: 0;
+}
+
+.cleaner-audit-item header {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.cleaner-audit-item .audit-line {
+  font-family: "Cascadia Code", "Source Code Pro", Consolas, ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  background: #eef3f8;
+  padding: 1px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.cleaner-audit-item .audit-kind {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+  color: #5a6f88;
+}
+
+.cleaner-audit-item.kind-boilerplateMacro .audit-kind {
+  color: #7c4f00;
+}
+
+.cleaner-audit-item.kind-boilerplateInvocation .audit-kind {
+  color: #5a6f88;
+}
+
+.cleaner-audit-item.kind-boilerplateLet .audit-kind {
+  color: #2c5282;
+}
+
+.cleaner-audit-item.kind-stepEndComment .audit-kind {
+  color: #6b4f8a;
+}
+
+.cleaner-audit-item pre {
+  margin: 0;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 4px;
+  font-family: "Cascadia Code", "Source Code Pro", Consolas, ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #2c3a52;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow: auto;
+}

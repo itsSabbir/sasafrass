@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import { Icon } from "../components/Icon";
 import { cleanSasCode } from "../cleaner";
+import type { RemovedSegment } from "../cleaner";
 import { downloadText, safeFilename } from "../exporters";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
@@ -10,7 +11,7 @@ export function CodeCleanerView() {
   const [copied, setCopied] = useState(false);
   const debounced = useDebouncedValue(input, 150);
   const result = useMemo(() => cleanSasCode(debounced), [debounced]);
-  const { cleaned, stats } = result;
+  const { cleaned, stats, removed } = result;
 
   const onInput = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -83,8 +84,63 @@ export function CodeCleanerView() {
           />
         </div>
       </div>
+
+      {removed.length > 0 && <RemovedAuditPanel removed={removed} />}
     </div>
   );
+}
+
+interface RemovedAuditPanelProps {
+  removed: readonly RemovedSegment[];
+}
+
+function RemovedAuditPanel({ removed }: RemovedAuditPanelProps) {
+  const totalLines = removed.reduce(
+    (sum, r) => sum + (r.inputLineEnd - r.inputLineStart + 1),
+    0
+  );
+  return (
+    <details className="cleaner-audit">
+      <summary>
+        <Icon name="search" />
+        <span>
+          Show what was removed — <strong>{removed.length}</strong> segments,{" "}
+          <strong>{totalLines.toLocaleString()}</strong> lines
+        </span>
+      </summary>
+      <ol className="cleaner-audit-list">
+        {removed.map((entry, idx) => (
+          <li key={idx} className={`cleaner-audit-item kind-${entry.category}`}>
+            <header>
+              <span className="audit-line">{formatRange(entry)}</span>
+              <span className="audit-kind">{categoryLabel(entry)}</span>
+            </header>
+            <pre>{entry.text}</pre>
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
+}
+
+function categoryLabel(entry: RemovedSegment): string {
+  switch (entry.category) {
+    case "boilerplateMacro":
+      return entry.name ? `Boilerplate macro · %macro ${entry.name}` : "Boilerplate macro";
+    case "boilerplateInvocation":
+      return "Boilerplate invocation";
+    case "boilerplateLet":
+      return "Boilerplate %let";
+    case "stepEndComment":
+      return "Step end marker";
+  }
+}
+
+function formatRange(entry: RemovedSegment): string {
+  if (entry.inputLineEnd > entry.inputLineStart) {
+    return `L${entry.inputLineStart}–${entry.inputLineEnd}`;
+  }
+  return `L${entry.inputLineStart}`;
 }
 
 function formatLines(out: number, total: number): string {
