@@ -135,7 +135,9 @@ describe("segment", () => {
   it("emits a single syslast segment for %let SYSLAST", () => {
     const segments = segment("%let SYSLAST = work.X;");
     expect(segments).toHaveLength(1);
-    expect(segments[0]).toEqual({ kind: "syslast", line: "%let SYSLAST = work.X;" });
+    expect(segments[0]).toMatchObject({ kind: "syslast", line: "%let SYSLAST = work.X;" });
+    expect(segments[0]).toHaveProperty("inputLineStart", 1);
+    expect(segments[0]).toHaveProperty("inputLineEnd", 1);
   });
 
   it("classifies boilerplate %let names but leaves user lets as code", () => {
@@ -332,5 +334,97 @@ describe("cleanSasCode", () => {
     const result = cleanSasCode(fullJobInput);
     expect(result.cleaned).toBe(fullJobExpected.replace(/\r\n/g, "\n").replace(/\s+$/, ""));
     expect(result.stats.percentReduction).toBeGreaterThanOrEqual(50);
+  });
+});
+
+describe("cleanSasCode — false-positive stripping protection (Phase 1 hardening)", () => {
+  it("does NOT strip a user comment that starts with the boilerplate phrase 'Runtime statistics macros'", () => {
+    const input = [
+      "/* Runtime statistics macros — added by Sabbir to track per-step timing */",
+      "proc sql; create table work.X as select 1 as a; quit;"
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.cleaned).toContain("added by Sabbir");
+    expect(result.cleaned).toContain("proc sql");
+  });
+
+  it("does NOT strip a user comment that extends the canonical 'Access the data for X' phrase", () => {
+    const input = [
+      "/* Access the data for SRCDB — note: requires AUTHDOMAIN=tdprod */",
+      "LIBNAME srcdb TERADATA SERVER=\"src.example.com\" SCHEMA=PUBLIC;"
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.cleaned).toContain("requires AUTHDOMAIN=tdprod");
+    expect(result.cleaned).toContain("LIBNAME srcdb");
+  });
+
+  it("DOES strip the canonical DIS noise comments verbatim", () => {
+    const input = [
+      "/* Runtime statistics macros  */",
+      "/* Access the data for SRCDB  */",
+      "LIBNAME srcdb TERADATA SERVER=\"src.example.com\" SCHEMA=PUBLIC;"
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.cleaned).not.toContain("Runtime statistics macros");
+    expect(result.cleaned).not.toContain("Access the data for");
+    expect(result.cleaned).toContain("LIBNAME srcdb");
+  });
+
+  it("does NOT strip a user comment that adds context after 'Map the columns'", () => {
+    const input = [
+      "/*---- Map the columns — see Confluence page for mapping rationale ----*/",
+      "proc sql; create table work.X as select 1 as a; quit;"
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.cleaned).toContain("Confluence page");
+  });
+});
+
+describe("cleanSasCode — audit trail (removed segments)", () => {
+  it("populates `removed` with one entry per stripped segment, carrying input line ranges", () => {
+    const input = [
+      "%let transformID = %quote(A);", // line 1: boilerplateLet
+      "%macro etls_recordCheck;",       // line 2-4: boilerplateMacro
+      "  data _null_; run;",            //
+      "%mend etls_recordCheck;",        //
+      "%etls_recordCheck;",             // line 5: boilerplateInvocation
+      "proc sql; quit;",                // line 6: code (kept)
+      "/** Step end FOO **/"            // line 7: stepEndComment
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.removed.length).toBeGreaterThanOrEqual(4);
+    const categories = result.removed.map((r) => r.category);
+    expect(categories).toContain("boilerplateLet");
+    expect(categories).toContain("boilerplateMacro");
+    expect(categories).toContain("boilerplateInvocation");
+    expect(categories).toContain("stepEndComment");
+    for (const r of result.removed) {
+      expect(r.inputLineStart).toBeGreaterThanOrEqual(1);
+      expect(r.inputLineEnd).toBeGreaterThanOrEqual(r.inputLineStart);
+      expect(r.text.length).toBeGreaterThan(0);
+    }
+    const macroEntry = result.removed.find((r) => r.category === "boilerplateMacro");
+    expect(macroEntry?.name).toBe("etls_recordCheck");
+  });
+
+  it("returns an empty `removed` array when input has no boilerplate", () => {
+    const result = cleanSasCode("proc sql; create table work.X as select 1 as a; quit;");
+    expect(result.removed).toEqual([]);
+  });
+
+  it("groups multi-line boilerplate macros into a single removed entry with the correct line range", () => {
+    const input = [
+      "%macro etls_recordCheck;",   // line 1
+      "  data _null_; run;",         // line 2
+      "%mend etls_recordCheck;"      // line 3
+    ].join("\n");
+    const result = cleanSasCode(input);
+    expect(result.removed).toHaveLength(1);
+    expect(result.removed[0]).toMatchObject({
+      category: "boilerplateMacro",
+      name: "etls_recordCheck",
+      inputLineStart: 1,
+      inputLineEnd: 3
+    });
   });
 });

@@ -1,4 +1,10 @@
-export type Segment =
+export interface SegmentRange {
+  // 1-indexed input line numbers, inclusive
+  inputLineStart: number;
+  inputLineEnd: number;
+}
+
+export type Segment = (
   | { kind: "jobHeader"; lines: string[] }
   | { kind: "stepHeader"; lines: string[] }
   | { kind: "boilerplateMacro"; name: string; lines: string[] }
@@ -6,7 +12,21 @@ export type Segment =
   | { kind: "boilerplateLet"; lines: string[] }
   | { kind: "syslast"; line: string }
   | { kind: "stepEndComment"; line: string }
-  | { kind: "code"; lines: string[] };
+  | { kind: "code"; lines: string[] }
+) & SegmentRange;
+
+export type RemovedCategory =
+  | "boilerplateMacro"
+  | "boilerplateInvocation"
+  | "boilerplateLet"
+  | "stepEndComment";
+
+export interface RemovedSegment extends SegmentRange {
+  category: RemovedCategory;
+  // Macro name for boilerplateMacro (e.g. "etls_recordCheck"); undefined otherwise.
+  name?: string;
+  text: string;
+}
 
 export interface ParsedJobHeader {
   job?: string;
@@ -32,4 +52,7 @@ export interface CleanStats {
 export interface CleanResult {
   cleaned: string;
   stats: CleanStats;
+  // Audit trail: every segment that was dropped, with its original input line range
+  // and the verbatim text. Drives the "Show what was removed" panel in the UI.
+  removed: RemovedSegment[];
 }
