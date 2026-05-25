@@ -62,8 +62,8 @@ export function Inspector(props: InspectorProps) {
       <aside className="inspector">
         <div className="inspector-header">
           <div>
-            <h2>Project</h2>
-            <p>Local-first workspace settings</p>
+            <h2>Project Settings</h2>
+            <p>Click a node on the canvas to edit its details</p>
           </div>
         </div>
         <Field label="Project name">
@@ -143,8 +143,8 @@ export function Inspector(props: InspectorProps) {
           <h2>{selectedNode.title}</h2>
           <p>{nodeTypeLabels[selectedNode.type]}</p>
         </div>
-        <button className="mini-button" title="Clear selection" onClick={() => setSelectedNodeId(null)}>
-          x
+        <button className="mini-button close-inspector" title="Deselect node — return to project settings" onClick={() => setSelectedNodeId(null)}>
+          ✕
         </button>
       </div>
 

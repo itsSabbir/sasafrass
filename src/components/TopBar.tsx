@@ -25,19 +25,18 @@ const modeLabels: Record<Mode, string> = {
   cleaner: "Code Cleaner"
 };
 
+const modeDescriptions: Record<Mode, string> = {
+  canvas: "Visual flow canvas — drag, connect, arrange",
+  runbook: "Ordered job list for DevOps handoff",
+  design: "Architecture metadata — columns, joins, DQ checks",
+  review: "Review summary — risks, questions, open items",
+  cleaner: "Strip SAS DI Studio boilerplate from code"
+};
+
 export function TopBar(props: TopBarProps) {
   const {
-    project,
-    mode,
-    setMode,
-    history,
-    fileInputRef,
-    importProject,
-    undo,
-    redo,
-    createNewProject,
-    exportBundle,
-    openCommandPalette
+    project, mode, setMode, history, fileInputRef,
+    importProject, undo, redo, createNewProject, exportBundle, openCommandPalette
   } = props;
 
   return (
@@ -52,19 +51,19 @@ export function TopBar(props: TopBarProps) {
       </div>
       <nav className="mode-tabs" aria-label="Workspace mode">
         {(Object.keys(modeLabels) as Mode[]).map((tab) => (
-          <button key={tab} className={mode === tab ? "active" : ""} onClick={() => setMode(tab)}>
+          <button key={tab} className={mode === tab ? "active" : ""} title={modeDescriptions[tab]} onClick={() => setMode(tab)}>
             {modeLabels[tab]}
           </button>
         ))}
       </nav>
       <div className="top-actions">
-        <button className="icon-button" title="Command palette" onClick={openCommandPalette}>
+        <button className="icon-button" title="Command palette (Ctrl+K)" onClick={openCommandPalette}>
           <Icon name="command" />
         </button>
-        <button className="icon-button" title="Undo" disabled={history.past.length === 0} onClick={undo}>
+        <button className="icon-button" title="Undo (Ctrl+Z)" disabled={history.past.length === 0} onClick={undo}>
           <Icon name="undo" />
         </button>
-        <button className="icon-button" title="Redo" disabled={history.future.length === 0} onClick={redo}>
+        <button className="icon-button" title="Redo (Ctrl+Y)" disabled={history.future.length === 0} onClick={redo}>
           <Icon name="redo" />
         </button>
         <button className="text-button" onClick={createNewProject}>

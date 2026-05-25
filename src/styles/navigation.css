@@ -15,6 +15,35 @@
   text-transform: uppercase;
 }
 
+.accordion-toggle {
+  width: 100%;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  justify-content: flex-start;
+}
+
+.accordion-arrow {
+  display: inline-block;
+  font-size: 8px;
+  color: #8494a7;
+  transition: transform 0.15s ease;
+}
+
+.accordion-arrow.open {
+  transform: rotate(90deg);
+}
+
+.panel-subheading {
+  margin: 12px 0 6px;
+  color: #5a6a7e;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .flow-list,
 .template-list,
 .search-results,
