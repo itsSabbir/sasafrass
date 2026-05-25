@@ -8,9 +8,10 @@ interface CleanerFileListProps {
   onRename: (id: string, name: string) => void;
   onRemove: (id: string) => void;
   onClear: () => void;
+  onBatchDownload?: () => void;
 }
 
-export function CleanerFileList({ files, totals, onRename, onRemove, onClear }: CleanerFileListProps) {
+export function CleanerFileList({ files, totals, onRename, onRemove, onClear, onBatchDownload }: CleanerFileListProps) {
   if (files.length === 0) return null;
   return (
     <section className="cleaner-queue">
@@ -24,9 +25,16 @@ export function CleanerFileList({ files, totals, onRename, onRemove, onClear }: 
             <span className="stat-good">{totals.percentReduction.toFixed(1)}% smaller</span>
           </p>
         </div>
-        <button className="text-button" onClick={onClear} title="Remove all queued files">
-          <Icon name="trash" /> Clear queue
-        </button>
+        <div className="cleaner-queue-actions">
+          {onBatchDownload && (
+            <button className="text-button primary" onClick={onBatchDownload} title="Download all cleaned files">
+              <Icon name="download" /> Download All
+            </button>
+          )}
+          <button className="text-button" onClick={onClear} title="Remove all queued files">
+            <Icon name="trash" /> Clear queue
+          </button>
+        </div>
       </header>
       <ol className="cleaner-queue-list">
         {files.map((f) => (
