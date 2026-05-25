@@ -1,12 +1,10 @@
 import { useRef, useState } from "react";
 import type { DragEvent, PointerEvent } from "react";
 import { clampNodeYToLane, environmentForY, snap } from "../app/canvasGeometry";
-import type { CanvasDetailMode, DragState, PanState } from "../app/appTypes";
-import { createNodeFromTemplate, duplicateNode, pasteNode as createPastedNode, templateForType } from "../app/flowFactories";
+import type { CanvasDetailMode, DragState, Mode, PanState } from "../app/appTypes";
+import { createDependencyEdge, createNodeFromTemplate, duplicateNode, pasteNode as createPastedNode, templateForType } from "../app/flowFactories";
 import { propagateDependencyInputs, removeDependencyAndPropagatedInputs } from "../app/flowConnections";
-import { createDependencyEdge } from "../app/flowFactories";
 import { nowIso } from "../data";
-import type { Mode } from "../app/appTypes";
 import type { Flow, FlowNode, NodeTemplate, NodeType, Point, Project, Viewport } from "../types";
 
 export interface CanvasInteractionState {

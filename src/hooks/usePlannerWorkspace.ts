@@ -141,7 +141,7 @@ export function usePlannerWorkspace() {
       { id: "export", label: "Export runbook bundle", action: exports.exportBundle },
       { id: "align", label: "Arrange flow", action: layout.alignToLanes }
     ],
-    [activeFlow, project, canvas.copiedNode, selectedNode]
+    [activeFlow, project]
   );
 
   const filteredNodes = (activeFlow?.nodes ?? []).filter((n) =>
