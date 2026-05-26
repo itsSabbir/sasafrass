@@ -2,7 +2,9 @@ import { useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { CommandAction, Mode, ProjectSnapshot } from "../app/appTypes";
 import { createEmptyFlow } from "../app/flowFactories";
+import { importSasFiles } from "../app/sasImporter";
 import { createDefaultProject, createId, nowIso } from "../data";
+import type { SasFileAnalysis } from "../cleaner/types";
 import { parseProjectJson } from "../exporters";
 import { buildRunbook, compareSchema } from "../graph";
 import { useCanvasInteraction } from "./useCanvasInteraction";
@@ -94,6 +96,16 @@ export function usePlannerWorkspace() {
     replaceProject(next, "New project");
     setActiveFlowId(next.flows[0]?.id ?? "");
     canvas.setSelectedNodeId(null);
+  }
+
+  function importSasToFlow(analyses: SasFileAnalysis[]): void {
+    if (!activeFlow || analyses.length === 0) return;
+    const result = importSasFiles(analyses, project);
+    updateActiveFlow(
+      (flow) => ({ ...flow, nodes: [...flow.nodes, ...result.nodes], edges: [...flow.edges, ...result.edges] }),
+      `Imported ${analyses.length} SAS ${analyses.length === 1 ? "file" : "files"}`
+    );
+    setMode("canvas");
   }
 
   function createFlow(): void {
@@ -196,6 +208,7 @@ export function usePlannerWorkspace() {
     createNewProject,
     createFlow,
     importProject,
+    importSasToFlow,
     exportProjectJson: exports.exportProjectJson,
     exportRunbookMarkdown: exports.exportRunbookMarkdown,
     exportRunbookCsv: exports.exportRunbookCsv,

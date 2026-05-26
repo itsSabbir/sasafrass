@@ -39,6 +39,30 @@ export interface ParsedStepHeader {
   description?: string;
   quickNote?: string[];
   warnings?: string[];
+  sourceTables?: string[];
+  targetTables?: string[];
+}
+
+export interface SasTableRef {
+  libref: string;
+  table: string;
+  fullName: string;
+}
+
+export interface SasStepInfo {
+  stepName: string;
+  transform: string;
+  description: string;
+  sourceTables: SasTableRef[];
+  targetTables: SasTableRef[];
+}
+
+export interface SasFileAnalysis {
+  jobName: string;
+  description: string;
+  steps: SasStepInfo[];
+  sourceTables: SasTableRef[];
+  targetTables: SasTableRef[];
 }
 
 export interface CleanStats {

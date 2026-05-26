@@ -36,12 +36,16 @@ export function parseJobHeader(lines: readonly string[]): ParsedJobHeader {
 
 export function parseStepHeader(lines: readonly string[]): ParsedStepHeader {
   const sections = parseSections(lines, STEP_KEYS);
+  const sourceLines = sectionToLines(sections.get("Source Table")) ?? sectionToLines(sections.get("Source Tables")) ?? [];
+  const targetLines = sectionToLines(sections.get("Target Table")) ?? sectionToLines(sections.get("Target Tables")) ?? [];
   return {
     step: sectionToInline(sections.get("Step")),
     transform: sectionToInline(sections.get("Transform")),
     description: sectionToInline(sections.get("Description")),
     quickNote: sectionToLines(sections.get("Quick Note")),
-    warnings: sectionToLines(sections.get("Warnings"))
+    warnings: sectionToLines(sections.get("Warnings")),
+    sourceTables: sourceLines.length > 0 ? sourceLines : undefined,
+    targetTables: targetLines.length > 0 ? targetLines : undefined
   };
 }
 

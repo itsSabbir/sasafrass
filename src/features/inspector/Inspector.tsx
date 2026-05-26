@@ -6,7 +6,8 @@ import { Field } from "../../components/Field";
 import { Icon } from "../../components/Icon";
 import { createId, nodeTypeLabels } from "../../data";
 import { getNodeIssues } from "../../graph";
-import type { Flow, FlowNode, Project, SchemaMetadata, ValidationIssue } from "../../types";
+import { BusinessRulesEditor } from "./BusinessRulesEditor";
+import type { Flow, FlowNode, Project, ScheduleMetadata, SchemaMetadata, ValidationIssue } from "../../types";
 
 interface InspectorProps {
   project: Project;
@@ -261,6 +262,42 @@ export function Inspector(props: InspectorProps) {
       <Field label="Validation checks">
         <DraftTextArea value={listToText(selectedNode.metadata.validations)} onCommit={(value) => updateNode(selectedNode.id, (node) => updateNodeMetadata(node, { validations: textToList(value) }), "Updated validations")} />
       </Field>
+
+      <div className="inspector-subhead">Scheduling</div>
+      <div className="field-grid two">
+        <Field label="Frequency">
+          <select
+            value={selectedNode.schedule.frequency}
+            onChange={(e) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, frequency: e.target.value as ScheduleMetadata["frequency"] } }), "Updated frequency")}
+          >
+            <option value="">Not set</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="on-demand">On-demand</option>
+            <option value="event-driven">Event-driven</option>
+          </select>
+        </Field>
+        <Field label="SLA deadline">
+          <DraftInput value={selectedNode.schedule.slaDeadline} onCommit={(v) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, slaDeadline: v } }), "Updated SLA")} />
+        </Field>
+        <Field label="Restart strategy">
+          <select
+            value={selectedNode.schedule.restartStrategy}
+            onChange={(e) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, restartStrategy: e.target.value as ScheduleMetadata["restartStrategy"] } }), "Updated restart strategy")}
+          >
+            <option value="">Not set</option>
+            <option value="safe-rerun">Safe rerun</option>
+            <option value="truncate-reload">Truncate + reload</option>
+            <option value="manual">Manual</option>
+          </select>
+        </Field>
+        <Field label="Parallel group">
+          <DraftInput value={selectedNode.schedule.parallelGroup} onCommit={(v) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, parallelGroup: v } }), "Updated parallel group")} />
+        </Field>
+      </div>
+
+      <BusinessRulesEditor node={selectedNode} onUpdate={updateNode} />
 
       <div className="inspector-subhead">Architecture metadata</div>
       <Field label="Source table/file">
