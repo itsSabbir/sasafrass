@@ -53,7 +53,7 @@ export function DesignView({ project, flow, issues, exportDesignReview }: Design
                     "-"}
                 </td>
                 <td>{[...node.metadata.producedOutputs, ...node.schema.outputColumns].join(", ") || "-"}</td>
-                <td>{[...node.metadata.openQuestions, ...node.metadata.risks, ...node.schema.dataQualityChecks].join(", ") || "-"}</td>
+                <td>{[...node.metadata.openQuestions, ...node.metadata.risks, ...node.schema.dataQualityChecks.map((a) => a.name)].join(", ") || "-"}</td>
               </tr>
             ))}
           </tbody>

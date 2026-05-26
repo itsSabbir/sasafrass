@@ -7,6 +7,7 @@ import type {
   NodeTemplate,
   NodeType,
   Project,
+  ScheduleMetadata,
   SchemaMetadata
 } from "./types";
 
@@ -69,6 +70,7 @@ export function emptyMetadata(overrides: Partial<NodeMetadata> = {}): NodeMetada
     assumptions: [],
     risks: [],
     reviewerComments: [],
+    businessRules: [],
     ...overrides
   };
 }
@@ -83,6 +85,20 @@ export function emptySchema(overrides: Partial<SchemaMetadata> = {}): SchemaMeta
     joinKeys: [],
     outputColumns: [],
     dataQualityChecks: [],
+    scdType: "",
+    columnLineage: [],
+    ...overrides
+  };
+}
+
+export function emptySchedule(overrides: Partial<ScheduleMetadata> = {}): ScheduleMetadata {
+  return {
+    frequency: "",
+    slaDeadline: "",
+    parallelGroup: "",
+    alertRecipients: [],
+    restartStrategy: "",
+    dependencyTimeout: "",
     ...overrides
   };
 }
@@ -102,7 +118,7 @@ export function defaultTemplates(): NodeTemplate[] {
       name: "Import",
       description: "Bring a staged table or file into the flow",
       nodeType: "source",
-      schema: { dataQualityChecks: ["Confirm source row count"] }
+      schema: { dataQualityChecks: [{ id: "dq_tpl_1", name: "Confirm source row count", type: "row-count", column: "", expression: "row count >= expected", threshold: "", failureMode: "warn", remediation: "" }] }
     },
     {
       id: "tpl_sort",
@@ -116,7 +132,7 @@ export function defaultTemplates(): NodeTemplate[] {
       name: "Join",
       description: "Join or lookup with explicit keys",
       nodeType: "join",
-      schema: { joinType: "left", dataQualityChecks: ["Check unmatched rows"] }
+      schema: { joinType: "left", dataQualityChecks: [{ id: "dq_tpl_2", name: "Check unmatched rows", type: "referential", column: "", expression: "no unmatched join keys", threshold: "", failureMode: "warn", remediation: "" }] }
     },
     {
       id: "tpl_append",
@@ -130,7 +146,7 @@ export function defaultTemplates(): NodeTemplate[] {
       name: "Summarize",
       description: "Aggregate data for mart or reporting output",
       nodeType: "transform",
-      schema: { dataQualityChecks: ["Reconcile totals to source"] }
+      schema: { dataQualityChecks: [{ id: "dq_tpl_3", name: "Reconcile totals to source", type: "row-count", column: "", expression: "output total matches source total", threshold: "", failureMode: "warn", remediation: "" }] }
     },
     {
       id: "tpl_derive",
@@ -170,6 +186,7 @@ function sampleNode(node: Partial<FlowNode> & Pick<FlowNode, "id" | "type" | "ti
       ...node.metadata
     }),
     schema: emptySchema(node.schema),
+    schedule: emptySchedule(),
     notes: node.notes ?? ""
   };
 }
@@ -248,7 +265,7 @@ export function createDefaultProject(): Project {
       }),
       schema: emptySchema({
         joinType: "left",
-        joinKeys: [{ left: "orders_clean.account_id", right: "accounts.account_id" }],
+        joinKeys: [{ left: "orders_clean.account_id", right: "accounts.account_id", cardinality: "M:1", keyType: "FK" }],
         selectedColumns: ["account_id", "order_id", "order_dt", "revenue_amt", "segment_cd"],
         outputColumns: ["account_id", "order_id", "order_dt", "revenue_amt", "segment_cd"]
       })
@@ -336,7 +353,7 @@ export function createDefaultProject(): Project {
   };
 
   return {
-    version: 1,
+    version: 2,
     id: "project_default",
     name: "SASDIS Flow Planner",
     description: "Local-first planning workspace for SAS job flows and DevOps handoffs.",

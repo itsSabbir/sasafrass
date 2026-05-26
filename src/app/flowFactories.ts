@@ -1,5 +1,5 @@
 import { clampNodeYToLane, environmentForY, laneBaseY, snap } from "./canvasGeometry";
-import { createId, emptyMetadata, emptySchema, executableNodeTypes, nodeTypeDescriptions, nodeTypeLabels } from "../data";
+import { createId, emptyMetadata, emptySchema, emptySchedule, executableNodeTypes, nodeTypeDescriptions, nodeTypeLabels } from "../data";
 import type { Flow, FlowEdge, FlowNode, NodeTemplate, NodeType, Point, Project } from "../types";
 
 export function templateForType(type: NodeType): NodeTemplate {
@@ -42,6 +42,7 @@ export function createNodeFromTemplate(args: {
       ...template.metadata
     }),
     schema: emptySchema(template.schema),
+    schedule: emptySchedule(),
     notes: ""
   };
 }

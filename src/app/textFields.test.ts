@@ -15,7 +15,7 @@ describe("text field adapters", () => {
 
   it("parses join keys", () => {
     const parsed = textToJoinKeys("left.id = right.id");
-    expect(parsed).toEqual([{ left: "left.id", right: "right.id" }]);
+    expect(parsed).toEqual([{ left: "left.id", right: "right.id", cardinality: "", keyType: "" }]);
     expect(joinKeysToText(parsed)).toBe("left.id = right.id");
   });
 

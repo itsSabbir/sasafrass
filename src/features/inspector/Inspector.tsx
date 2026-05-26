@@ -305,7 +305,14 @@ export function Inspector(props: InspectorProps) {
         />
       </Field>
       <Field label="Data quality checks">
-        <DraftTextArea value={listToText(selectedNode.schema.dataQualityChecks)} onCommit={(value) => updateNode(selectedNode.id, (node) => updateNodeSchema(node, { dataQualityChecks: textToList(value) }), "Updated DQ checks")} />
+        <DraftTextArea
+          value={selectedNode.schema.dataQualityChecks.map((a) => a.name).join("\n")}
+          onCommit={(value) => updateNode(selectedNode.id, (node) => updateNodeSchema(node, {
+            dataQualityChecks: value.split("\n").filter((l) => l.trim()).map((name, i) => ({
+              id: `dq_${Date.now()}_${i}`, name: name.trim(), type: "custom" as const, column: "", expression: name.trim(), threshold: "", failureMode: "warn" as const, remediation: ""
+            }))
+          }), "Updated DQ checks")}
+        />
       </Field>
 
       <div className="inspector-subhead">Review annotations</div>

@@ -182,7 +182,7 @@ export function textToJoinKeys(value: string): JoinKey[] {
     .filter(Boolean)
     .map((line) => {
       const [left, ...rest] = line.split(/\s*=\s*|\s*:\s*/);
-      return { left: left.trim(), right: rest.join(" = ").trim() || "TBD" };
+      return { left: left.trim(), right: rest.join(" = ").trim() || "TBD", cardinality: "" as const, keyType: "" as const };
     })
     .filter((key) => key.left);
 }
