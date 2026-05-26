@@ -290,14 +290,74 @@
   text-transform: uppercase;
 }
 
-.node-meta {
+.node-env-badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.node-summary {
   margin-top: 7px;
+  min-height: 32px;
+}
+
+.node-meta {
   color: #566579;
   font-size: 12.5px;
   line-height: 1.35;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.node-meta.secondary {
+  margin-top: 2px;
+  color: #8494a7;
+  font-size: 11.5px;
+}
+
+.flow-node.has-error {
+  border-left: 3px solid var(--red);
+}
+
+.flow-node.has-warning {
+  border-left: 3px solid var(--amber);
+}
+
+.canvas-empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.empty-card {
+  max-width: 340px;
+  padding: 28px 32px;
+  border: 2px dashed #c4cedb;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.empty-card h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.empty-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .node-chip-row {

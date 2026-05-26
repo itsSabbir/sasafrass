@@ -15,6 +15,7 @@ export function CodeCleanerView() {
   const [copied, setCopied] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [showRemoved, setShowRemoved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const debounced = useDebouncedValue(input, 150);
@@ -22,6 +23,11 @@ export function CodeCleanerView() {
   const { cleaned, stats, removed } = result;
   const suggestedName = useMemo(() => suggestNameFromCleaned(cleaned) ?? "", [cleaned]);
   const effectiveName = draftName.trim() || suggestedName;
+
+  const diffOutput = useMemo(() => {
+    if (!showRemoved || removed.length === 0) return null;
+    return buildDiffView(input, removed);
+  }, [showRemoved, input, removed]);
 
   const onInput = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -52,7 +58,7 @@ export function CodeCleanerView() {
     if (input.trim().length === 0) return;
     const file = queue.addFile(input, effectiveName);
     if (file) {
-      setStatusMessage(`Added "${file.name}" to the queue.`);
+      setStatusMessage(`Added "${file.name}" to queue (${queue.files.length + 1}/20 files)`);
       setInput("");
       setDraftName("");
     }
@@ -67,12 +73,7 @@ export function CodeCleanerView() {
     event.target.value = "";
   };
 
-  const onDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragging(true);
-  };
-  const onDragLeave = () => setDragging(false);
-  const onDrop = async (event: DragEvent<HTMLDivElement>) => {
+  const onDropZone = async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDragging(false);
     const list = event.dataTransfer?.files;
@@ -91,28 +92,26 @@ export function CodeCleanerView() {
     if (added > 0) setStatusMessage(`Added ${added} ${added === 1 ? "file" : "files"} to the queue.`);
   };
 
+  const onBatchDownload = () => {
+    for (const file of queue.files) {
+      downloadText(`${safeFilename(file.name)}.sas`, file.cleaned, "text/plain");
+    }
+  };
+
   return (
     <div
       className={`view-scroll cleaner-view${dragging ? " drag-active" : ""}`}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={(e) => { if (e.currentTarget === e.target) setDragging(false); }}
+      onDrop={onDropZone}
     >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".sas,.txt"
-        multiple
-        className="hidden"
-        onChange={onFileInputChange}
-      />
+      <input ref={fileInputRef} type="file" accept=".sas,.txt" multiple className="hidden" onChange={onFileInputChange} />
 
       <div className="view-header">
         <div>
           <h1>Code Cleaner</h1>
           <p>
-            Strips SAS Data Integration Studio boilerplate (etls macros, perf wrappers, GUID banners) so the actual logic stands out. Paste files
-            below or drop <code>.sas</code> files anywhere on this view to queue them up.
+            Strips SAS Data Integration Studio boilerplate so the actual logic stands out.
           </p>
         </div>
         <button className="text-button" onClick={onPickFile}>
@@ -120,24 +119,43 @@ export function CodeCleanerView() {
         </button>
       </div>
 
-      <div className="cleaner-stats">
-        <strong>{formatLines(stats.outputLines, stats.inputLines)}</strong>
-        <span>{formatBytes(stats.outputBytes, stats.inputBytes)}</span>
-        <span className={stats.percentReduction > 0 ? "stat-good" : ""}>{formatReduction(stats.percentReduction)}</span>
-        <div className="cleaner-actions">
-          <button className="text-button" onClick={onClearInput} disabled={input.length === 0}>
-            <Icon name="trash" /> Clear
-          </button>
-          <button className="text-button" onClick={onDownload} disabled={cleaned.length === 0}>
-            <Icon name="download" /> Download .sas
-          </button>
-          <button className="text-button" onClick={onCopy} disabled={cleaned.length === 0}>
-            <Icon name={copied ? "check" : "copy"} /> {copied ? "Copied" : "Copy clean"}
-          </button>
-          <button className="text-button primary" onClick={onAddToQueue} disabled={cleaned.length === 0}>
-            <Icon name="plus" /> Add to queue
-          </button>
-        </div>
+      <div
+        className={`cleaner-dropzone${dragging ? " drop-active" : ""}`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDropZone}
+        onClick={onPickFile}
+      >
+        <Icon name="upload" />
+        <span>Drop .sas files here or click to browse</span>
+      </div>
+
+      <div className="cleaner-stats-bar">
+        <span className="cleaner-stats-summary">
+          {stats.inputLines > 0
+            ? `Removed ${stats.inputLines - stats.outputLines} lines (${removed.length} segments) — ${formatReduction(stats.percentReduction)}`
+            : "Paste or drop SAS code above to start cleaning"
+          }
+        </span>
+        <label className="cleaner-toggle">
+          <input type="checkbox" checked={showRemoved} onChange={(e) => setShowRemoved(e.target.checked)} />
+          Show removed
+        </label>
+      </div>
+
+      <div className="cleaner-actions-bar">
+        <button className="text-button" onClick={onClearInput} disabled={input.length === 0}>
+          <Icon name="trash" /> Clear
+        </button>
+        <button className="text-button" onClick={onDownload} disabled={cleaned.length === 0}>
+          <Icon name="download" /> Download .sas
+        </button>
+        <button className="text-button" onClick={onCopy} disabled={cleaned.length === 0}>
+          <Icon name={copied ? "check" : "copy"} /> {copied ? "Copied" : "Copy clean"}
+        </button>
+        <button className="text-button primary" onClick={onAddToQueue} disabled={input.trim().length === 0}>
+          <Icon name="plus" /> Add to queue
+        </button>
       </div>
 
       {statusMessage && (
@@ -159,14 +177,25 @@ export function CodeCleanerView() {
           />
         </div>
         <div className="cleaner-pane">
-          <label htmlFor="cleaner-output">Cleaned</label>
-          <textarea
-            id="cleaner-output"
-            className="cleaner-textarea"
-            value={cleaned}
-            readOnly
-            spellCheck={false}
-          />
+          <label htmlFor="cleaner-output">Cleaned{showRemoved ? " (diff view)" : ""}</label>
+          {showRemoved && diffOutput ? (
+            <div className="cleaner-diff" id="cleaner-output">
+              {diffOutput.map((line, i) => (
+                <div key={i} className={line.removed ? "diff-line removed" : "diff-line kept"}>
+                  <span className="diff-gutter">{line.lineNo}</span>
+                  <span className="diff-text">{line.text}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <textarea
+              id="cleaner-output"
+              className="cleaner-textarea"
+              value={cleaned}
+              readOnly
+              spellCheck={false}
+            />
+          )}
         </div>
       </div>
 
@@ -180,7 +209,6 @@ export function CodeCleanerView() {
           placeholder={suggestedName || "auto-suggest from job header"}
           spellCheck={false}
         />
-        <span className="cleaner-name-hint">Press <kbd>Add to queue</kbd> above to save this paste with the name above.</span>
       </div>
 
       {removed.length > 0 && <RemovedAuditPanel removed={removed} />}
@@ -191,9 +219,31 @@ export function CodeCleanerView() {
         onRename={queue.renameFile}
         onRemove={queue.removeFile}
         onClear={queue.clearQueue}
+        onBatchDownload={queue.files.length > 0 ? onBatchDownload : undefined}
       />
     </div>
   );
+}
+
+interface DiffLine {
+  lineNo: number;
+  text: string;
+  removed: boolean;
+}
+
+function buildDiffView(input: string, removed: readonly RemovedSegment[]): DiffLine[] {
+  const lines = input.split("\n");
+  const removedLines = new Set<number>();
+  for (const segment of removed) {
+    for (let i = segment.inputLineStart; i <= segment.inputLineEnd; i++) {
+      removedLines.add(i);
+    }
+  }
+  return lines.map((text, i) => ({
+    lineNo: i + 1,
+    text,
+    removed: removedLines.has(i + 1)
+  }));
 }
 
 interface RemovedAuditPanelProps {
@@ -201,18 +251,12 @@ interface RemovedAuditPanelProps {
 }
 
 function RemovedAuditPanel({ removed }: RemovedAuditPanelProps) {
-  const totalLines = removed.reduce(
-    (sum, r) => sum + (r.inputLineEnd - r.inputLineStart + 1),
-    0
-  );
+  const totalLines = removed.reduce((sum, r) => sum + (r.inputLineEnd - r.inputLineStart + 1), 0);
   return (
     <details className="cleaner-audit">
       <summary>
         <Icon name="search" />
-        <span>
-          Show what was removed — <strong>{removed.length}</strong> segments,{" "}
-          <strong>{totalLines.toLocaleString()}</strong> lines
-        </span>
+        <span>Show what was removed — <strong>{removed.length}</strong> segments, <strong>{totalLines.toLocaleString()}</strong> lines</span>
       </summary>
       <ol className="cleaner-audit-list">
         {removed.map((entry, idx) => (
@@ -231,35 +275,15 @@ function RemovedAuditPanel({ removed }: RemovedAuditPanelProps) {
 
 function categoryLabel(entry: RemovedSegment): string {
   switch (entry.category) {
-    case "boilerplateMacro":
-      return entry.name ? `Boilerplate macro · %macro ${entry.name}` : "Boilerplate macro";
-    case "boilerplateInvocation":
-      return "Boilerplate invocation";
-    case "boilerplateLet":
-      return "Boilerplate %let";
-    case "stepEndComment":
-      return "Step end marker";
+    case "boilerplateMacro": return entry.name ? `Boilerplate macro · %macro ${entry.name}` : "Boilerplate macro";
+    case "boilerplateInvocation": return "Boilerplate invocation";
+    case "boilerplateLet": return "Boilerplate %let";
+    case "stepEndComment": return "Step end marker";
   }
 }
 
 function formatRange(entry: RemovedSegment): string {
-  if (entry.inputLineEnd > entry.inputLineStart) {
-    return `L${entry.inputLineStart}–${entry.inputLineEnd}`;
-  }
-  return `L${entry.inputLineStart}`;
-}
-
-function formatLines(out: number, total: number): string {
-  return `${out.toLocaleString()} / ${total.toLocaleString()} lines`;
-}
-
-function formatBytes(out: number, total: number): string {
-  return `${formatKb(out)} / ${formatKb(total)}`;
-}
-
-function formatKb(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  return `${(bytes / 1024).toFixed(1)} KB`;
+  return entry.inputLineEnd > entry.inputLineStart ? `L${entry.inputLineStart}–${entry.inputLineEnd}` : `L${entry.inputLineStart}`;
 }
 
 function formatReduction(percent: number): string {

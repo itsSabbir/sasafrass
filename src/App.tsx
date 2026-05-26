@@ -34,7 +34,7 @@ export default function App() {
         openCommandPalette={() => workspace.setCommandOpen(true)}
       />
 
-      <StatusStrip issueCounts={workspace.issueCounts} runbook={runbook} activeFlow={activeFlow} />
+      <StatusStrip issueCounts={workspace.issueCounts} runbook={runbook} activeFlow={activeFlow} allIssues={workspace.allIssues} onSelectNode={(nodeId) => { workspace.setSelectedNodeId(nodeId); workspace.setMode("canvas"); }} />
 
       <main className="app-main">
         <LeftPanel

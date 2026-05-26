@@ -72,6 +72,7 @@
 .mode-tabs button.active {
   color: #fff;
   background: var(--ink);
+  border-bottom: 2px solid var(--red);
 }
 
 .top-actions,
@@ -149,13 +150,17 @@
   color: var(--red);
 }
 
+.status-strip-wrap {
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+}
+
 .status-strip {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 14px;
-  border-bottom: 1px solid var(--line);
-  background: #f8fafc;
+  min-height: 38px;
 }
 
 .health-pill {
@@ -198,6 +203,45 @@
 .status-spacer,
 .toolbar-spacer {
   flex: 1;
+}
+
+.health-pill.clickable {
+  cursor: pointer;
+}
+
+.health-pill.clickable:hover {
+  filter: brightness(0.96);
+}
+
+.status-issue-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 14px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.status-issue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.status-issue.error { border-color: #efb4af; }
+.status-issue.warning { border-color: #efd19a; }
+
+.status-issue-msg { color: var(--ink); }
+
+.status-issue-node {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 10px;
 }
 
 .status-text {
