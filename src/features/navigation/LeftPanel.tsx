@@ -45,13 +45,13 @@ export function LeftPanel(props: LeftPanelProps) {
   return (
     <aside className="left-panel">
       <section className="panel-section">
-        <button className="panel-heading accordion-toggle" onClick={() => toggle("flows")}>
+        <div className="panel-heading accordion-toggle" role="button" tabIndex={0} onClick={() => toggle("flows")} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggle("flows"); }}>
           <span className={`accordion-arrow ${expanded.has("flows") ? "open" : ""}`}>&#9654;</span>
           <span>Flows</span>
           <button className="mini-button" title="Add flow" onClick={(e) => { e.stopPropagation(); createFlow(); }}>
             <Icon name="plus" />
           </button>
-        </button>
+        </div>
         {expanded.has("flows") && (
           <div className="flow-list">
             {project.flows.map((flow) => (

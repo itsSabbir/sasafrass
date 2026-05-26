@@ -29,26 +29,68 @@ function compactText(value: string, maxLength = 48): string {
   return normalized.length <= maxLength ? normalized : `${normalized.slice(0, maxLength - 1)}...`;
 }
 
-function nodeSummaryLines(node: FlowNode): [string, string] {
+function nodeSummaryLines(node: FlowNode, mode: CanvasDetailMode): [string, string] {
+  if (mode === "architecture") {
+    const line1 = compactText(
+      node.schema.sourceName ||
+      (node.schema.joinKeys.length > 0 ? node.schema.joinKeys.map((k) => `${k.left}=${k.right}`).join("; ") : "") ||
+      (node.schema.derivedColumns.length > 0 ? node.schema.derivedColumns.map((c) => `${c.name}=${c.expression}`).join("; ") : "") ||
+      (node.schema.outputColumns.length > 0 ? node.schema.outputColumns.join(", ") : "") ||
+      "Architecture details pending"
+    );
+    const line2 = compactText(
+      node.schema.selectedColumns.length > 0 ? `${node.schema.selectedColumns.length} columns selected` :
+      node.schema.outputColumns.length > 0 ? `${node.schema.outputColumns.length} output columns` : ""
+    );
+    return [line1, line2];
+  }
+  if (mode === "review") {
+    const line1 = compactText(
+      node.metadata.risks[0] || node.metadata.openQuestions[0] || node.metadata.reviewerComments[0] || node.notes || "No review notes yet"
+    );
+    const line2 = compactText(
+      node.metadata.assumptions[0] || ""
+    );
+    return [line1, line2];
+  }
   const line1 = compactText(
-    node.metadata.jobName || node.schema.sourceName || node.metadata.producedOutputs[0] || node.metadata.requiredInputs[0] || ""
+    node.metadata.jobName || node.metadata.producedOutputs[0] || node.schema.sourceName || node.metadata.requiredInputs[0] || ""
   );
   const line2 = compactText(
     node.schema.sourceName && node.metadata.jobName ? node.schema.sourceName :
     node.schema.joinKeys.length > 0 ? `Join: ${node.schema.joinKeys.map((k) => `${k.left}=${k.right}`).join(", ")}` :
     node.schema.selectedColumns.length > 0 ? `${node.schema.selectedColumns.length} columns selected` :
-    node.schema.outputColumns.length > 0 ? `${node.schema.outputColumns.length} output columns` :
     node.metadata.producedOutputs[0] ?? ""
   );
   return [line1 || "Details pending", line2];
 }
 
-function nodeChips(node: FlowNode, inCount: number, outCount: number): string[] {
-  return [
+function nodeChips(node: FlowNode, inCount: number, outCount: number, mode: CanvasDetailMode): string[] {
+  const shared = [
     inCount > 0 ? `up ${inCount}` : "",
-    outCount > 0 ? `down ${outCount}` : "",
+    outCount > 0 ? `down ${outCount}` : ""
+  ];
+  if (mode === "architecture") {
+    return [...shared,
+      node.schema.selectedColumns.length > 0 ? `${node.schema.selectedColumns.length} cols` : "",
+      node.schema.outputColumns.length > 0 ? `${node.schema.outputColumns.length} out cols` : "",
+      node.schema.joinKeys.length > 0 ? `keys ${node.schema.joinKeys.length}` : "",
+      node.schema.derivedColumns.length > 0 ? `derives ${node.schema.derivedColumns.length}` : "",
+      node.schema.dataQualityChecks.length > 0 ? `${node.schema.dataQualityChecks.length} DQ` : ""
+    ].filter(Boolean).slice(0, 4);
+  }
+  if (mode === "review") {
+    return [...shared,
+      node.metadata.openQuestions.length > 0 ? `${node.metadata.openQuestions.length} questions` : "",
+      node.metadata.risks.length > 0 ? `${node.metadata.risks.length} risks` : "",
+      node.metadata.assumptions.length > 0 ? `${node.metadata.assumptions.length} assumptions` : "",
+      node.metadata.reviewerComments.length > 0 ? `${node.metadata.reviewerComments.length} comments` : ""
+    ].filter(Boolean).slice(0, 4);
+  }
+  return [...shared,
     node.metadata.requiredInputs.length > 0 ? `${node.metadata.requiredInputs.length} inputs` : "",
-    node.metadata.producedOutputs.length > 0 ? `${node.metadata.producedOutputs.length} outputs` : ""
+    node.metadata.producedOutputs.length > 0 ? `${node.metadata.producedOutputs.length} outputs` : "",
+    node.metadata.validations.length > 0 ? `${node.metadata.validations.length} checks` : ""
   ].filter(Boolean).slice(0, 4);
 }
 
@@ -64,8 +106,8 @@ export const FlowNodeCard = memo(function FlowNodeCard(props: FlowNodeCardProps)
   const hasWarning = !hasError && nodeIssues.some((i) => i.severity === "warning");
   const inCount = edges.filter((e) => e.target === node.id).length;
   const outCount = edges.filter((e) => e.source === node.id).length;
-  const chips = nodeChips(node, inCount, outCount);
-  const [summary1, summary2] = nodeSummaryLines(node);
+  const chips = nodeChips(node, inCount, outCount, canvasDetailMode);
+  const [summary1, summary2] = nodeSummaryLines(node, canvasDetailMode);
   const isSelected = selectedNodeId === node.id;
   const dimmed = focusNeighborhood && !relatedNodeIds.has(node.id);
   const upstream = Boolean(selectedNodeId && edges.some((e) => e.source === node.id && e.target === selectedNodeId));

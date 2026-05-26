@@ -30,10 +30,10 @@ export function StatusStrip({ issueCounts, runbook, activeFlow, allIssues, onSel
           {issueCounts.error} errors
         </button>
         <button
-          className={issueCounts.warning > 0 ? "health-pill warning clickable" : "health-pill warning"}
+          className={issueCounts.warning > 0 ? "health-pill warning clickable" : "health-pill ok"}
           onClick={() => issueCounts.warning > 0 && toggleSeverity("warning")}
         >
-          <Icon name="warning" />
+          {issueCounts.warning > 0 ? <Icon name="warning" /> : <Icon name="check" />}
           {issueCounts.warning} warnings
         </button>
         <div className="health-pill info">{runbook.jobs.length} runnable jobs</div>

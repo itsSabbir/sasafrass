@@ -99,7 +99,12 @@ export function CodeCleanerView() {
   };
 
   return (
-    <div className="view-scroll cleaner-view">
+    <div
+      className={`view-scroll cleaner-view${dragging ? " drag-active" : ""}`}
+      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={(e) => { if (e.currentTarget === e.target) setDragging(false); }}
+      onDrop={onDropZone}
+    >
       <input ref={fileInputRef} type="file" accept=".sas,.txt" multiple className="hidden" onChange={onFileInputChange} />
 
       <div className="view-header">
