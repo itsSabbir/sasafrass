@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { DraftInput } from "../../components/DraftFields";
 import { Icon } from "../../components/Icon";
-import { createId } from "../../data";
 import type { BusinessRule, CaseWhenRule, FlowNode, LookupRule, ThresholdRule } from "../../types";
 
 interface BusinessRulesEditorProps {
@@ -10,13 +8,11 @@ interface BusinessRulesEditorProps {
 }
 
 export function BusinessRulesEditor({ node, onUpdate }: BusinessRulesEditorProps) {
-  const [addingType, setAddingType] = useState<BusinessRule["type"] | null>(null);
   const rules = node.metadata.businessRules;
 
   function addRule(type: BusinessRule["type"]): void {
     const rule = createEmptyRule(type);
     onUpdate(node.id, (n) => ({ ...n, metadata: { ...n.metadata, businessRules: [...n.metadata.businessRules, rule] } }), "Added business rule");
-    setAddingType(null);
   }
 
   function removeRule(index: number): void {

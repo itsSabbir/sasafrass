@@ -7,7 +7,9 @@ import { Icon } from "../../components/Icon";
 import { createId, nodeTypeLabels } from "../../data";
 import { getNodeIssues } from "../../graph";
 import { BusinessRulesEditor } from "./BusinessRulesEditor";
-import type { Flow, FlowNode, Project, ScheduleMetadata, SchemaMetadata, ValidationIssue } from "../../types";
+import { ProjectInspector } from "./ProjectInspector";
+import { SchedulingEditor } from "./SchedulingEditor";
+import type { Flow, FlowNode, Project, SchemaMetadata, ValidationIssue } from "../../types";
 
 interface InspectorProps {
   project: Project;
@@ -59,66 +61,7 @@ export function Inspector(props: InspectorProps) {
   }
 
   if (!selectedNode) {
-    return (
-      <aside className="inspector">
-        <div className="inspector-header">
-          <div>
-            <h2>Project Settings</h2>
-            <p>Click a node on the canvas to edit its details</p>
-          </div>
-        </div>
-        <Field label="Project name">
-          <DraftInput value={project.name} onCommit={(value) => updateProject({ name: value })} />
-        </Field>
-        <Field label="Owner">
-          <DraftInput value={project.owner} onCommit={(value) => updateProject({ owner: value })} />
-        </Field>
-        <Field label="Description">
-          <DraftTextArea value={project.description} onCommit={(value) => updateProject({ description: value })} />
-        </Field>
-        <div className="field-grid two">
-          <Field label="Business area">
-            <DraftInput
-              value={project.metadata.businessArea}
-              onCommit={(value) => commitProject((current) => ({ ...current, metadata: { ...current.metadata, businessArea: value } }), "Updated business area")}
-            />
-          </Field>
-          <Field label="Release">
-            <DraftInput
-              value={project.metadata.release}
-              onCommit={(value) => commitProject((current) => ({ ...current, metadata: { ...current.metadata, release: value } }), "Updated release")}
-            />
-          </Field>
-        </div>
-        <Field label="Jira key">
-          <DraftInput
-            value={project.metadata.jiraKey}
-            onCommit={(value) => commitProject((current) => ({ ...current, metadata: { ...current.metadata, jiraKey: value } }), "Updated Jira key")}
-          />
-        </Field>
-        <div className="inspector-subhead">Active flow</div>
-        <Field label="Flow name">
-          <DraftInput value={activeFlow.name} onCommit={(value) => updateFlow({ name: value })} />
-        </Field>
-        <Field label="Flow description">
-          <DraftTextArea value={activeFlow.description} onCommit={(value) => updateFlow({ description: value })} />
-        </Field>
-        <div className="inspector-subhead with-action">
-          <span>Environment lanes</span>
-          <button className="mini-button" onClick={addEnvironment}>
-            <Icon name="plus" />
-          </button>
-        </div>
-        <div className="environment-editor">
-          {project.environments.map((environment) => (
-            <div key={environment.id} className="environment-row">
-              <input type="color" value={environment.color} onChange={(event) => updateEnvironment(environment.id, { color: event.target.value })} />
-              <DraftInput value={environment.name} onCommit={(value) => updateEnvironment(environment.id, { name: value })} />
-            </div>
-          ))}
-        </div>
-      </aside>
-    );
+    return <ProjectInspector project={project} activeFlow={activeFlow} commitProject={commitProject} updateProject={updateProject} updateFlow={updateFlow} updateEnvironment={updateEnvironment} addEnvironment={addEnvironment} />;
   }
 
   const nodeIssues = getNodeIssues(allIssues, selectedNode.id);
@@ -263,39 +206,7 @@ export function Inspector(props: InspectorProps) {
         <DraftTextArea value={listToText(selectedNode.metadata.validations)} onCommit={(value) => updateNode(selectedNode.id, (node) => updateNodeMetadata(node, { validations: textToList(value) }), "Updated validations")} />
       </Field>
 
-      <div className="inspector-subhead">Scheduling</div>
-      <div className="field-grid two">
-        <Field label="Frequency">
-          <select
-            value={selectedNode.schedule.frequency}
-            onChange={(e) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, frequency: e.target.value as ScheduleMetadata["frequency"] } }), "Updated frequency")}
-          >
-            <option value="">Not set</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="on-demand">On-demand</option>
-            <option value="event-driven">Event-driven</option>
-          </select>
-        </Field>
-        <Field label="SLA deadline">
-          <DraftInput value={selectedNode.schedule.slaDeadline} onCommit={(v) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, slaDeadline: v } }), "Updated SLA")} />
-        </Field>
-        <Field label="Restart strategy">
-          <select
-            value={selectedNode.schedule.restartStrategy}
-            onChange={(e) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, restartStrategy: e.target.value as ScheduleMetadata["restartStrategy"] } }), "Updated restart strategy")}
-          >
-            <option value="">Not set</option>
-            <option value="safe-rerun">Safe rerun</option>
-            <option value="truncate-reload">Truncate + reload</option>
-            <option value="manual">Manual</option>
-          </select>
-        </Field>
-        <Field label="Parallel group">
-          <DraftInput value={selectedNode.schedule.parallelGroup} onCommit={(v) => updateNode(selectedNode.id, (n) => ({ ...n, schedule: { ...n.schedule, parallelGroup: v } }), "Updated parallel group")} />
-        </Field>
-      </div>
+      <SchedulingEditor node={selectedNode} onUpdate={updateNode} />
 
       <BusinessRulesEditor node={selectedNode} onUpdate={updateNode} />
 

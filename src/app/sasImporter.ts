@@ -18,14 +18,16 @@ export function importSasFiles(analyses: SasFileAnalysis[], project: Project): I
   const dwEnv = envIds[1] ?? envIds[0] ?? "staging";
   const analysisEnv = envIds[2] ?? envIds[1] ?? envIds[0] ?? "staging";
   let xOffset = 80;
+  let sourceYOffset = 80;
 
   for (const analysis of analyses) {
     // Create source nodes for input tables not already produced in this batch
     for (const src of analysis.sourceTables) {
       if (!tableToProducer.has(src.fullName)) {
-        const node = createSourceNode(src, stagingEnv, xOffset, 80);
+        const node = createSourceNode(src, stagingEnv, xOffset, sourceYOffset);
         nodes.push(node);
         tableToProducer.set(src.fullName, node.id);
+        sourceYOffset += 200; // space each source node vertically
       }
     }
 

@@ -73,8 +73,10 @@ function extractCodeTableRefs(lines: readonly string[]): CodeTableRefs {
   const targets: SasTableRef[] = [];
   const joined = lines.join("\n");
 
-  // DATA step targets: "data lib.table;" or "data table;"
+  // DATA step targets: "data lib.table;" or "data table;" (skip _null_ and _data_)
   for (const match of joined.matchAll(/\bdata\s+([\w.]+)\s*[;(]/gi)) {
+    const name = match[1].toLowerCase();
+    if (name === "_null_" || name === "_data_") continue;
     targets.push(parseTableRef(match[1]));
   }
 
@@ -84,10 +86,10 @@ function extractCodeTableRefs(lines: readonly string[]): CodeTableRefs {
   }
 
   // PROC SQL: "from lib.table" or "FROM lib.table AS"
+  const sqlKeywords = new Set(["dual", "dictionary", "sashelp", "select", "where", "group", "order", "having", "connection", "into"]);
   for (const match of joined.matchAll(/\bfrom\s+([\w.]+)/gi)) {
     const ref = parseTableRef(match[1]);
-    // skip SQL keywords that look like table names
-    if (!["dual", "dictionary", "sashelp"].includes(ref.libref)) {
+    if (!sqlKeywords.has(ref.table) && !sqlKeywords.has(ref.libref)) {
       sources.push(ref);
     }
   }
