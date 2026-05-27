@@ -40,11 +40,33 @@ export function serializeProject(project: Project): string {
 }
 
 export function parseProjectJson(raw: string): Project {
-  const parsed = JSON.parse(raw) as Project;
-  if (parsed.version !== 1 || !Array.isArray(parsed.flows) || !Array.isArray(parsed.environments)) {
+  const parsed = JSON.parse(raw) as Record<string, unknown>;
+  if (!Array.isArray(parsed.flows) || !Array.isArray(parsed.environments)) {
     throw new Error("This does not look like a SASDIS Flow Planner project file.");
   }
-  return parsed;
+  // v1 → v2 migration: add defaults for new fields
+  const project = parsed as unknown as Project;
+  project.version = 2;
+  for (const flow of project.flows) {
+    for (const node of flow.nodes) {
+      if (!node.schedule) node.schedule = { frequency: "", slaDeadline: "", parallelGroup: "", alertRecipients: [], restartStrategy: "", dependencyTimeout: "" };
+      if (!node.metadata.businessRules) node.metadata.businessRules = [];
+      if (!node.schema.columnLineage) node.schema.columnLineage = [];
+      if (node.schema.scdType === undefined) node.schema.scdType = "";
+      // migrate string[] DQ checks to DQAssertion[]
+      if (Array.isArray(node.schema.dataQualityChecks) && node.schema.dataQualityChecks.length > 0 && typeof node.schema.dataQualityChecks[0] === "string") {
+        node.schema.dataQualityChecks = (node.schema.dataQualityChecks as unknown as string[]).map((text, i) => ({
+          id: `dq_migrated_${i}`, name: text, type: "custom" as const, column: "", expression: text, threshold: "", failureMode: "warn" as const, remediation: ""
+        }));
+      }
+      for (const key of node.schema.joinKeys) {
+        // v1 join keys lack cardinality/keyType — default them
+        if (!(key as unknown as Record<string, unknown>).cardinality) key.cardinality = "";
+        if (!(key as unknown as Record<string, unknown>).keyType) key.keyType = "";
+      }
+    }
+  }
+  return project;
 }
 
 export function generateRunbookMarkdown(project: Project, flow: Flow, runbook: Runbook = buildRunbook(project, flow)): string {
@@ -164,7 +186,7 @@ export function generateDesignReview(project: Project, flow: Flow): string {
     lines.push(`- Filters: ${list(node.schema.filters) || "-"}`);
     lines.push(`- Join: ${node.schema.joinType || "-"} ${node.schema.joinKeys.map((key) => `${key.left} = ${key.right}`).join("; ")}`);
     lines.push(`- Output columns: ${list(node.schema.outputColumns) || "-"}`);
-    lines.push(`- Data quality checks: ${list(node.schema.dataQualityChecks) || "-"}`);
+    lines.push(`- Data quality checks: ${node.schema.dataQualityChecks.map((a) => a.name).join("; ") || "-"}`);
     lines.push(`- Open questions: ${list(node.metadata.openQuestions) || "-"}`);
     lines.push(`- Assumptions: ${list(node.metadata.assumptions) || "-"}`);
     lines.push(`- Risks: ${list(node.metadata.risks) || "-"}`);

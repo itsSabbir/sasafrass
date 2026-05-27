@@ -2,7 +2,9 @@ import { useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { CommandAction, Mode, ProjectSnapshot } from "../app/appTypes";
 import { createEmptyFlow } from "../app/flowFactories";
+import { importSasFiles } from "../app/sasImporter";
 import { createDefaultProject, createId, nowIso } from "../data";
+import type { SasFileAnalysis } from "../cleaner/types";
 import { parseProjectJson } from "../exporters";
 import { buildRunbook, compareSchema } from "../graph";
 import { useCanvasInteraction } from "./useCanvasInteraction";
@@ -96,6 +98,16 @@ export function usePlannerWorkspace() {
     canvas.setSelectedNodeId(null);
   }
 
+  function importSasToFlow(analyses: SasFileAnalysis[]): void {
+    if (!activeFlow || analyses.length === 0) return;
+    const result = importSasFiles(analyses, project);
+    updateActiveFlow(
+      (flow) => ({ ...flow, nodes: [...flow.nodes, ...result.nodes], edges: [...flow.edges, ...result.edges] }),
+      `Imported ${analyses.length} SAS ${analyses.length === 1 ? "file" : "files"}`
+    );
+    setMode("canvas");
+  }
+
   function createFlow(): void {
     const flow = createEmptyFlow(project.flows.length + 1);
     commitProject((current) => ({ ...current, flows: [...current.flows, flow] }), "Added flow");
@@ -137,7 +149,7 @@ export function usePlannerWorkspace() {
       { id: "fit", label: "Fit canvas", action: layout.fitView },
       { id: "runbook", label: "Open SAS jobs", action: () => setMode("runbook") },
       { id: "review", label: "Open reviewer mode", action: () => setMode("review") },
-      { id: "cleaner", label: "Open Code Cleaner", action: () => setMode("cleaner") },
+      { id: "import", label: "Open Import", action: () => setMode("import") },
       { id: "export", label: "Export runbook bundle", action: exports.exportBundle },
       { id: "align", label: "Arrange flow", action: layout.alignToLanes }
     ],
@@ -196,6 +208,7 @@ export function usePlannerWorkspace() {
     createNewProject,
     createFlow,
     importProject,
+    importSasToFlow,
     exportProjectJson: exports.exportProjectJson,
     exportRunbookMarkdown: exports.exportRunbookMarkdown,
     exportRunbookCsv: exports.exportRunbookCsv,

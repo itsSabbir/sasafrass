@@ -104,7 +104,7 @@ export default function App() {
           {workspace.mode === "review" && (
             <ReviewerView project={workspace.project} flow={activeFlow} runbook={runbook} issues={workspace.allIssues} exportBundle={workspace.exportBundle} />
           )}
-          {workspace.mode === "cleaner" && <CodeCleanerView />}
+          {workspace.mode === "import" && <CodeCleanerView onImportToFlow={workspace.importSasToFlow} />}
         </section>
 
         <Inspector

@@ -3,12 +3,17 @@ import type { ChangeEvent, DragEvent } from "react";
 import { CleanerFileList } from "../components/CleanerFileList";
 import { Icon } from "../components/Icon";
 import { cleanSasCode } from "../cleaner";
-import type { RemovedSegment } from "../cleaner";
+import { analyzeSasFile } from "../cleaner/sasAnalyzer";
+import type { RemovedSegment, SasFileAnalysis } from "../cleaner/types";
 import { downloadText, safeFilename } from "../exporters";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { suggestNameFromCleaned, useFileQueue } from "../hooks/useFileQueue";
 
-export function CodeCleanerView() {
+interface CodeCleanerViewProps {
+  onImportToFlow?: (analyses: SasFileAnalysis[]) => void;
+}
+
+export function CodeCleanerView({ onImportToFlow }: CodeCleanerViewProps) {
   const queue = useFileQueue();
   const [input, setInput] = useState("");
   const [draftName, setDraftName] = useState("");
@@ -156,6 +161,22 @@ export function CodeCleanerView() {
         <button className="text-button primary" onClick={onAddToQueue} disabled={input.trim().length === 0}>
           <Icon name="plus" /> Add to queue
         </button>
+        {onImportToFlow && (
+          <button
+            className="text-button primary"
+            disabled={queue.files.length === 0 && input.trim().length === 0}
+            onClick={() => {
+              const analyses: SasFileAnalysis[] = [];
+              // Analyze queued files
+              for (const f of queue.files) analyses.push(analyzeSasFile(f.input));
+              // Analyze current input if present
+              if (input.trim()) analyses.push(analyzeSasFile(input));
+              onImportToFlow(analyses);
+            }}
+          >
+            <Icon name="connector" /> Import to Flow
+          </button>
+        )}
       </div>
 
       {statusMessage && (

@@ -37,6 +37,67 @@ export interface DerivedColumn {
 export interface JoinKey {
   left: string;
   right: string;
+  cardinality: "1:1" | "1:M" | "M:1" | "M:M" | "";
+  keyType: "PK" | "FK" | "BK" | "SK" | "none" | "";
+}
+
+export type DQCheckType = "not-null" | "unique" | "referential" | "range" | "row-count" | "custom";
+
+export interface DQAssertion {
+  id: string;
+  name: string;
+  type: DQCheckType;
+  column: string;
+  expression: string;
+  threshold: string;
+  failureMode: "block" | "warn" | "log";
+  remediation: string;
+}
+
+export interface CaseWhenCondition {
+  when: string;
+  then: string;
+}
+
+export interface CaseWhenRule {
+  type: "case-when";
+  column: string;
+  conditions: CaseWhenCondition[];
+  elseValue: string;
+}
+
+export interface LookupRule {
+  type: "lookup";
+  sourceColumn: string;
+  lookupTable: string;
+  lookupKey: string;
+  returnColumn: string;
+}
+
+export interface ThresholdRule {
+  type: "threshold";
+  column: string;
+  operator: ">" | "<" | ">=" | "<=" | "=" | "!=";
+  value: string;
+  action: string;
+}
+
+export type BusinessRule = CaseWhenRule | LookupRule | ThresholdRule;
+
+export interface ColumnLineage {
+  outputColumn: string;
+  sourceNodeId: string;
+  sourceColumn: string;
+  transform: string;
+}
+
+export interface ScheduleMetadata {
+  frequency: "daily" | "weekly" | "monthly" | "on-demand" | "event-driven" | "";
+  slaDeadline: string;
+  parallelGroup: string;
+  alertRecipients: string[];
+  restartStrategy: "safe-rerun" | "truncate-reload" | "manual" | "";
+  dependencyTimeout: string;
 }
 
 export interface SchemaMetadata {
@@ -47,7 +108,9 @@ export interface SchemaMetadata {
   joinType: "inner" | "left" | "right" | "full" | "cross" | "";
   joinKeys: JoinKey[];
   outputColumns: string[];
-  dataQualityChecks: string[];
+  dataQualityChecks: DQAssertion[];
+  scdType: "none" | "1" | "2" | "3" | "";
+  columnLineage: ColumnLineage[];
 }
 
 export interface NodeMetadata {
@@ -64,6 +127,7 @@ export interface NodeMetadata {
   assumptions: string[];
   risks: string[];
   reviewerComments: string[];
+  businessRules: BusinessRule[];
 }
 
 export interface FlowNode {
@@ -74,6 +138,7 @@ export interface FlowNode {
   position: Point;
   metadata: NodeMetadata;
   schema: SchemaMetadata;
+  schedule: ScheduleMetadata;
   notes: string;
 }
 
@@ -112,7 +177,7 @@ export interface ProjectMetadata {
 }
 
 export interface Project {
-  version: 1;
+  version: 1 | 2;
   id: string;
   name: string;
   description: string;

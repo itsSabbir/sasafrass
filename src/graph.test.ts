@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultProject, emptyMetadata, emptySchema } from "./data";
+import { createDefaultProject, emptyMetadata, emptySchema, emptySchedule } from "./data";
 import { buildRunbook, topologicalSort, validateFlow } from "./graph";
 import type { FlowNode } from "./types";
 
@@ -50,6 +50,7 @@ describe("graph planning", () => {
       position: { x: 20, y: 20 },
       metadata: emptyMetadata(),
       schema: emptySchema(),
+      schedule: emptySchedule(),
       notes: ""
     };
     const flow = { ...project.flows[0], nodes: [node], edges: [] };

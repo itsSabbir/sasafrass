@@ -18,19 +18,19 @@ interface TopBarProps {
 }
 
 const modeLabels: Record<Mode, string> = {
+  import: "Import",
   canvas: "Flow Plan",
-  runbook: "SAS Jobs",
   design: "Data Design",
-  review: "Review",
-  cleaner: "Code Cleaner"
+  runbook: "SAS Jobs",
+  review: "Review"
 };
 
 const modeDescriptions: Record<Mode, string> = {
+  import: "Drop SAS files, clean boilerplate, and import into flows",
   canvas: "Visual flow canvas — drag, connect, arrange",
-  runbook: "Ordered job list for DevOps handoff",
   design: "Architecture metadata — columns, joins, DQ checks",
-  review: "Review summary — risks, questions, open items",
-  cleaner: "Strip SAS DI Studio boilerplate from code"
+  runbook: "Ordered job list for DevOps handoff",
+  review: "Review summary — risks, questions, open items"
 };
 
 export function TopBar(props: TopBarProps) {
