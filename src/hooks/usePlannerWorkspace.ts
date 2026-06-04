@@ -149,7 +149,6 @@ export function usePlannerWorkspace() {
       { id: "fit", label: "Fit canvas", action: layout.fitView },
       { id: "runbook", label: "Open SAS jobs", action: () => setMode("runbook") },
       { id: "review", label: "Open reviewer mode", action: () => setMode("review") },
-      { id: "import", label: "Open Import", action: () => setMode("import") },
       { id: "export", label: "Export runbook bundle", action: exports.exportBundle },
       { id: "align", label: "Arrange flow", action: layout.alignToLanes }
     ],

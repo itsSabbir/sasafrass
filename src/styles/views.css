@@ -386,7 +386,7 @@
 .cleaner-view.drag-active::after {
   content: "Drop SAS files to queue them";
   position: fixed;
-  inset: 60px 24px 24px 280px;
+  inset: 64px 24px 24px 24px;
   display: grid;
   place-items: center;
   background: rgba(15, 23, 42, 0.18);

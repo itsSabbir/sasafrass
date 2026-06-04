@@ -1,6 +1,7 @@
 import type { Point, Project, Viewport } from "../types";
 
-export type Mode = "import" | "canvas" | "design" | "runbook" | "review";
+export type Tool = "compactor" | "planner";
+export type Mode = "canvas" | "design" | "runbook" | "review";
 export type CanvasDetailMode = "handoff" | "architecture" | "review";
 
 export interface ProjectSnapshot {

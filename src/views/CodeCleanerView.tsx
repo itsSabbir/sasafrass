@@ -114,7 +114,7 @@ export function CodeCleanerView({ onImportToFlow }: CodeCleanerViewProps) {
 
       <div className="view-header">
         <div>
-          <h1>Code Cleaner</h1>
+          <h1>Code Compactor</h1>
           <p>
             Strips SAS Data Integration Studio boilerplate so the actual logic stands out.
           </p>
