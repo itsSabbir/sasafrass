@@ -13,6 +13,8 @@ import type {
 
 export const STORAGE_KEY = "sasafrass.project.v1";
 export const SNAPSHOT_KEY = "sasafrass.snapshots.v1";
+export const TOOL_KEY = "sasafrass.activeTool.v1";
+export const ACTIVE_FLOW_KEY = "sasafrass.activeFlow.v1";
 
 export const NODE_WIDTH = 296;
 export const NODE_HEIGHT = 168;

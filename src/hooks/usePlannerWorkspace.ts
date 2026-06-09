@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { CommandAction, Mode, ProjectSnapshot } from "../app/appTypes";
 import { createEmptyFlow } from "../app/flowFactories";
 import { importSasFiles } from "../app/sasImporter";
+import { loadActiveFlowId, persistActiveFlowId, resolveActiveFlowId } from "../app/storage";
 import { createDefaultProject, createId, nowIso } from "../data";
 import type { SasFileAnalysis } from "../cleaner/types";
 import { parseProjectJson } from "../exporters";
@@ -18,8 +19,16 @@ export function usePlannerWorkspace() {
   const doc = useProjectDocument();
   const { project, projectRef, history, snapshots, commitProject, mutateProjectLive, replaceProject, commitLiveProject, undo, redo } = doc;
 
-  const [activeFlowId, setActiveFlowId] = useState(() => project.flows[0]?.id ?? "");
+  const [activeFlowId, setActiveFlowId] = useState(() => resolveActiveFlowId(loadActiveFlowId(), project.flows.map((f) => f.id)));
   const [mode, setMode] = useState<Mode>("canvas");
+
+  // Persist the active flow so it survives the planner unmount on tool switch; the
+  // "Import to Flow" handoff remounts the planner and must target the same flow.
+  useEffect(() => {
+    if (activeFlowId) {
+      persistActiveFlowId(activeFlowId);
+    }
+  }, [activeFlowId]);
   const [nodeSearch, setNodeSearch] = useState("");
   const [commandOpen, setCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
@@ -149,7 +158,6 @@ export function usePlannerWorkspace() {
       { id: "fit", label: "Fit canvas", action: layout.fitView },
       { id: "runbook", label: "Open SAS jobs", action: () => setMode("runbook") },
       { id: "review", label: "Open reviewer mode", action: () => setMode("review") },
-      { id: "import", label: "Open Import", action: () => setMode("import") },
       { id: "export", label: "Export runbook bundle", action: exports.exportBundle },
       { id: "align", label: "Arrange flow", action: layout.alignToLanes }
     ],

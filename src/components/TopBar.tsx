@@ -18,7 +18,6 @@ interface TopBarProps {
 }
 
 const modeLabels: Record<Mode, string> = {
-  import: "Import",
   canvas: "Flow Plan",
   design: "Data Design",
   runbook: "SAS Jobs",
@@ -26,7 +25,6 @@ const modeLabels: Record<Mode, string> = {
 };
 
 const modeDescriptions: Record<Mode, string> = {
-  import: "Drop SAS files, clean boilerplate, and import into flows",
   canvas: "Visual flow canvas — drag, connect, arrange",
   design: "Architecture metadata — columns, joins, DQ checks",
   runbook: "Ordered job list for DevOps handoff",

@@ -1,5 +1,64 @@
-.app-shell {
+.app-root {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #eef2f7;
+}
+
+.tool-switcher {
+  flex: 0 0 auto;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: var(--ink);
+  border-bottom: 2px solid var(--red);
+}
+
+.tool-switcher-brand {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+
+.tool-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tool-tabs button {
+  min-width: 132px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #cdd5e2;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tool-tabs button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tool-tabs button.active {
+  color: var(--ink);
+  background: #fff;
+}
+
+.tool-surface {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.app-shell {
+  height: 100%;
   display: grid;
   grid-template-rows: 58px 38px 1fr;
   background: #eef2f7;

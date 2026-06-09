@@ -2,6 +2,11 @@
 
 SASDIS Flow Planner is a local-first web app for designing SASDIS-style job flows, planning SAS data architecture, and producing clean DevOps handoff artifacts without using Excel as the source of truth.
 
+The app is a small multi-tool workspace with a top-level switcher between two tools:
+
+- **Code Compactor** (default) — strips SAS Data Integration Studio boilerplate so the actual logic stands out, with a clean/diff view, a multi-file queue, and an optional "Import to Flow" handoff into the planner.
+- **Flow Planner** — the planning surfaces (Flow Plan, Data Design, SAS Jobs, Review) described throughout this document.
+
 The current product direction is documented in [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md). The primary surface is the Flow Plan: a readable planning map for where work runs, what artifacts move through the flow, and what depends on what. SAS job handoff is generated from that map as a secondary view.
 
 The product is built for teams that need to answer three practical questions quickly:
@@ -229,11 +234,13 @@ This repository is intentionally not a monorepo. It is one focused frontend pack
 ```text
 src/
   app/          app-level helpers, factories, storage, constants, text adapters
-  components/   reusable UI primitives and shell controls
-  features/     large product surfaces: canvas, inspector, navigation
+  cleaner/      Code Compactor engine: SAS segmenter, renderer, analyzer
+  components/   reusable UI primitives, the tool switcher, and shell controls
+  features/     large product surfaces: canvas, inspector, navigation, planner shell
   hooks/        project document state and workspace action orchestration
   styles/       focused CSS modules
-  views/        SAS Jobs, Data Design, and Review
+  views/        Code Compactor, SAS Jobs, Data Design, and Review
+  App.tsx       top-level tool shell: switches between Compactor and Planner
   data.ts       defaults, templates, sample project, metadata factories
   exporters.ts  JSON, Markdown, CSV, design review, and SVG exports
   graph.ts      ordering, validation, schema comparison, runbook assembly
