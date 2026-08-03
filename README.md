@@ -39,7 +39,7 @@ Included now:
 - Review view.
 - Validation health checks.
 - Markdown, CSV, JSON, and SVG exports.
-- CI workflow and agent review docs.
+- Local validation commands and agent review docs.
 
 Not included yet:
 
@@ -262,7 +262,6 @@ Core design principles:
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [Review guide](docs/REVIEW_GUIDE.md)
 - [Agent review manifest](docs/agent-review.yml)
-- [CI workflow](.github/workflows/ci.yml)
 - [PR checklist](.github/pull_request_template.md)
 
 ## Scripts
