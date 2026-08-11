@@ -27,7 +27,7 @@ export function resolveShortcut(event: KeyEvent, actions: KeyboardShortcutAction
   if (mod && key === "y") { event.preventDefault(); actions.redo(); return true; }
   if (mod && key === "s") { event.preventDefault(); actions.saveProject(); return true; }
   if (!event.editing && event.key === "Delete") { event.preventDefault(); actions.deleteSelectedNode(); return true; }
-  if (!event.editing && event.key === "Escape") { actions.clearConnecting(); actions.closeCommandPalette(); return true; }
+  if (event.key === "Escape") { actions.clearConnecting(); actions.closeCommandPalette(); return true; }
   return false;
 }
 

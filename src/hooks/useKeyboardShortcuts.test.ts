@@ -70,6 +70,14 @@ describe("resolveShortcut", () => {
     expect(actions.closeCommandPalette).toHaveBeenCalledOnce();
   });
 
+  it("Escape closes the palette while its search field is focused", () => {
+    const actions = createActions();
+    const handled = resolveShortcut(keyEvent("Escape", { editing: true }), actions);
+    expect(handled).toBe(true);
+    expect(actions.clearConnecting).toHaveBeenCalledOnce();
+    expect(actions.closeCommandPalette).toHaveBeenCalledOnce();
+  });
+
   it("bare K without modifier does not open palette", () => {
     const actions = createActions();
     const handled = resolveShortcut(keyEvent("k"), actions);
