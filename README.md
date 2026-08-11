@@ -300,7 +300,7 @@ Create a production build in `dist/`.
 npm run ci
 ```
 
-Run typecheck, tests, and production build.
+Run tests, then the typechecked production build.
 
 ```bash
 npm run preview
