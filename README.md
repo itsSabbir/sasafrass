@@ -39,7 +39,7 @@ Included now:
 - Review view.
 - Validation health checks.
 - Markdown, CSV, JSON, and SVG exports.
-- CI workflow and agent review docs.
+- Local validation commands and agent review docs.
 
 Not included yet:
 
@@ -140,12 +140,12 @@ Run the full verification suite:
 npm run ci
 ```
 
-That runs:
+That runs the test suite, then a production build. The production build runs
+TypeScript validation before Vite:
 
 ```bash
-npm run typecheck
 npm test
-npm run build
+npm run build # tsc && vite build
 ```
 
 ## How To Use The App
@@ -262,7 +262,6 @@ Core design principles:
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [Review guide](docs/REVIEW_GUIDE.md)
 - [Agent review manifest](docs/agent-review.yml)
-- [CI workflow](.github/workflows/ci.yml)
 - [PR checklist](.github/pull_request_template.md)
 
 ## Scripts
@@ -301,7 +300,7 @@ Create a production build in `dist/`.
 npm run ci
 ```
 
-Run typecheck, tests, and production build.
+Run tests, then the typechecked production build.
 
 ```bash
 npm run preview
