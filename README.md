@@ -140,12 +140,12 @@ Run the full verification suite:
 npm run ci
 ```
 
-That runs:
+That runs the test suite, then a production build. The production build runs
+TypeScript validation before Vite:
 
 ```bash
-npm run typecheck
 npm test
-npm run build
+npm run build # tsc && vite build
 ```
 
 ## How To Use The App
